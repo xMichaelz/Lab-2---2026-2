@@ -1,15 +1,13 @@
 package com.udea.lab12026p.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Generated;
 
 import java.time.LocalDateTime;
 
-@Data
 @Entity
-@Table(name="transaction")
+@Table(name = "transactions")
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +21,8 @@ public class Transaction {
     @Column(nullable = false)
     private Double amount;
 
-    // @Column(nullable = false)
-     private LocalDateTime timestamp = LocalDateTime.now();
-
+    @Column(nullable = false)
+    private LocalDateTime timestamp;
 
     public Transaction() {
     }
@@ -36,6 +33,13 @@ public class Transaction {
         this.receiverAccountNumber = receiverAccountNumber;
         this.amount = amount;
         this.timestamp = timestamp;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (timestamp == null) {
+            timestamp = LocalDateTime.now();
+        }
     }
 
     public Long getId() {

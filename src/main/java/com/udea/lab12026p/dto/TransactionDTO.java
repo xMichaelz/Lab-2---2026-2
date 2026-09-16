@@ -1,17 +1,14 @@
 package com.udea.lab12026p.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.time.LocalDateTime;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionDTO {
 
     private Long id;
     private String senderAccountNumber;
     private String receiverAccountNumber;
     private Double amount;
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private LocalDateTime timestamp;
 
     public TransactionDTO() {
     }
@@ -22,7 +19,6 @@ public class TransactionDTO {
         this.receiverAccountNumber = receiverAccountNumber;
         this.amount = amount;
         this.timestamp = timestamp;
-
     }
 
     public Long getId() {

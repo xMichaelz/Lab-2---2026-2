@@ -122,3 +122,12 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/lab2p2026:latest
             ${{ secrets.DOCKER_USERNAME }}/lab2p2026:${{ github.sha }}
+  # 5. Despliegue en Render (solo si la imagen se publicó correctamente)
+  deploy:
+    name: Deploy to Render
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      # Le pide a Render que descargue la imagen nueva y la despliegue
+      - name: Trigger Render deploy
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"

@@ -18,6 +18,9 @@
 		<java.version>17</java.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<lombok.version>1.18.30</lombok.version>
+		<sonar.projectKey>xMichaelz_Lab-2---2026-2</sonar.projectKey>
+		<sonar.organization>xmichaelz</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>

@@ -46,6 +46,14 @@ class Lab12026pApplicationTests {
     }
 
     @Test
+    void health_returnsUp() throws Exception {
+        mockMvc.perform(get("/api/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.version").value("1.1.0"));
+    }
+
+    @Test
     void createCustomer_success() throws Exception {
         CustomerDTO customer = new CustomerDTO(null, "Ana", "Perez", "111111", 1000.0);
 

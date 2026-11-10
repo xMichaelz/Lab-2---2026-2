@@ -1,4 +1,4 @@
-# GH actions
+# Nombre del workflow
 name: CI/CD Pipeline
 
 on:
@@ -10,11 +10,10 @@ on:
       - main
 
 jobs:
-  # Job de pruebas unitarias
+  # 1. Pruebas unitarias
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,20 +28,17 @@ jobs:
       - name: Run Tests
         run: mvn -B test
 
-  # Job de análisis de calidad con SonarCloud
+  # 2. Análisis de calidad con SonarCloud
   sonar:
     name: SonarCloud analysis
-    # Solo se ejecuta si las pruebas pasan
     needs: tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Historial completo para que Sonar calcule el código nuevo
           fetch-depth: 0
 
       - name: Set up JDK 17
@@ -60,3 +56,69 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+
+  # 3. Construcción del artefacto JAR
+  build:
+    name: Build
+    needs: sonar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package -DskipTests --file pom.xml
+
+      # Sube el JAR para compartirlo con los siguientes jobs
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab2p2026-jar
+          path: target/lab12026p.jar
+
+  # 4. Construcción y publicación de la imagen en Docker Hub
+  docker:
+    name: Docker image
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Descarga el JAR generado por el job "build"
+      - name: Download JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: lab2p2026-jar
+          path: target
+
+      # Permite construir la imagen para varias arquitecturas
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          # amd64 para la nube y arm64 para tu Mac
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/lab2p2026:latest
+            ${{ secrets.DOCKER_USERNAME }}/lab2p2026:${{ github.sha }}

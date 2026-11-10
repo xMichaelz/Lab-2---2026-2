@@ -1,3 +1,5 @@
+[![CI/CD Pipeline](https://github.com/xMichaelz/Lab-2---2026-2/actions/workflows/build.yml/badge.svg)](https://github.com/xMichaelz/Lab-2---2026-2/actions/workflows/build.yml)
+
 # lab12026p — Laboratorio 1: Introducción a Spring Boot
 
 Aplicación bancaria sencilla con backend REST en Spring Boot y frontend React (Vite + Axios).

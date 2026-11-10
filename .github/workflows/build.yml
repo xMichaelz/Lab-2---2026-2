@@ -4,8 +4,13 @@ name: CI/CD Pipeline
 on:
   # Permite ejecutar el workflow manualmente
   workflow_dispatch:
-  # Se ejecuta con cada push a la rama main
+  # Push a main y a la rama de trabajo
   push:
+    branches:
+      - main
+      - feature/health-endpoint
+  # Pull requests hacia main
+  pull_request:
     branches:
       - main
 
@@ -61,6 +66,7 @@ jobs:
   build:
     name: Build
     needs: sonar
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
